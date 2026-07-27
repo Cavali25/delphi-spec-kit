@@ -17,17 +17,21 @@ description: "Pragmatic clean code standards for Delphi — concise, direct, no 
 | **YAGNI** | Don't build what wasn't asked for |
 | **Boy Scout** | Leave the code better than you found it |
 
-## Naming Rules (Pascal Guide)
+## Naming Rules (Delphi Style Guide)
 
-| Element | Convention |
-|----------|-----------|
-| **Variables** | Reveal intent: `LCustomerCount` not `N` |
-| **Methods** | Verb + noun: `GetCustomerById` not `Customer` |
-| **Booleans** | Question form: `IsActive`, `HasPermission`, `CanEdit` |
-| **Constants** | SCREAMING_SNAKE: `MAX_RETRY_COUNT` |
-| **Fields** | Prefix `F`: `FCustomerName` |
-| **Parameters** | Prefix `A`: `ACustomerName` |
-| **Var. locations** | Prefix `L`: `LCustomer` |
+| Element | Prefix | Convention | Example |
+|----------|--------|-----------|---------|
+| **Fields** | `F` | PascalCase | `FCustomerName`, `FValorTotal` |
+| **Parameters** | `A` | PascalCase | `ACustomerName`, `AValor` |
+| **Local vars** | `L` | PascalCase, reveal intent | `LCustomerCount` not `N` |
+| **Constants** | `C_` | UPPER_SNAKE | `C_MAX_RETRY_COUNT`, `C_SQL_PEDIDOS` |
+| **Classes/Types** | `T` | PascalCase | `TCliente`, `TPedidoService` |
+| **Interfaces** | `I` | PascalCase | `IClienteService`, `IRepository` |
+| **Exceptions** | `E` | PascalCase | `EClienteNaoEncontrado` |
+| **Methods** | (verb) | Verb + noun | `CalcularICMS`, `GetCustomerById`, `ValidarCPF` |
+| **Booleans** | — | Question form | `IsActive`, `HasPermission`, `CanEdit` |
+
+**Proibido:** notação húngara (`sNome`, `iCount`), underline em identificadores (exceto `C_`), `p` como prefixo de parâmetro.
 
 > **Rule:** If you need a comment to explain a name, rename it.
 

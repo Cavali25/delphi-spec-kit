@@ -7,6 +7,34 @@ description: "Delphi code review checklist — quality, security, performance, S
 
 ## Quick Checklist
 
+### 🚨 BLOQUEANTE (deve ser corrigido)
+- [ ] SQL parametrizado (nunca concatenado) — risco de SQL Injection
+- [ ] `try..finally` para cada recurso alocado — risco de memory leak
+- [ ] Um recurso por bloco `try..finally` — múltiplos recursos inseguros
+- [ ] Credenciais hardcoded (senha, IP, usuário de BD no fonte)
+- [ ] Bloco `except` vazio — engole exceções
+- [ ] `const` em parâmetros de interface — quebra ARC, causa leak
+
+### ⚠️ ATENÇÃO (risco relevante)
+- [ ] `with` statement — causa ambiguidade, dificulta debug
+- [ ] `Break` / `Continue` — usar condição do loop
+- [ ] `Exit` fora de guard clause
+- [ ] `Real` como tipo de ponto flutuante
+- [ ] RecordCount para verificar existência — usar `IsEmpty`
+- [ ] Locate em tabelas grandes — usar `FindKey`/`FindNearest`
+- [ ] Notação húngara (`sNome`, `iCount`) — usar prefixos F/A/L
+- [ ] Variáveis globais de unit — usar `class var`
+
+### 💡 RECOMENDAÇÃO (qualidade)
+- [ ] Métodos >30 linhas — extrair em métodos menores
+- [ ] Classes >500 linhas — considerar extração (SRP)
+- [ ] Magic numbers — usar constantes nomeadas
+- [ ] Poliade (4+ parâmetros) — usar DTO/record
+- [ ] Lógica de negócio nos Forms — delegar para Services
+- [ ] Componentes com nome padrão (Button1, Edit1) — renomear com prefixo
+- [ ] SQL espalhado nos Forms — centralizar em units de SQL
+- [ ] Código sem documentação de regras de negócio
+
 ### Corretude
 - [ ] Code does what it's supposed to do
 - [ ] Edge cases handled (nil, empty list, zero value)
