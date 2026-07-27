@@ -1,40 +1,40 @@
 ---
-description: "Delphi code refactoring — techniques to improve readability, remove code smells and apply patterns without changing behavior"
+description: "Refatoração Delphi — técnicas para melhorar legibilidade, remover code smells e aplicar padrões sem mudar comportamento"
 globs: ["**/*.pas"]
 alwaysApply: false
 ---
 
-# Delphi Code Refactoring — Claude Rules
+# Refatoração Delphi — Regras Claude
 
-Use these rules when detecting or fixing code smells in Object Pascal. Refactoring **doesn't change behavior** — it just improves the internal structure.
+Use estas regras ao detectar ou corrigir code smells em Object Pascal. Refatoração **não muda comportamento**; apenas melhora a estrutura interna.
 
 ---
 
-## 🔴 Code Smells that Require Immediate Refactoring
+## 🔴 Code Smells que Exigem Refatoração Imediata
 
-| Code Smell | Symptom | Technique |
+| Code Smell | Sintoma | Técnica |
 |---|---|---|
-| Long method | > 20 lines | Extract Method |
-| Bloated class | > 300 lines / multiple responsibilities | Extract Class |
-| Magic numbers | `if Age > 18` | Replace with Constant |
-| Deep Nesting | `if...if...if` above 2 levels | Replace with Guard Clauses |
-| Duplicate code | Same block in ≥ 2 places | Extract Method / Pull Up |
-| Excessive parameters | Method with > 4 parameters | Introduce Parameter Object |
-| Mixed UI logic | Business in `OnClick` | Move Method to Service |
-| `with` statement | `with DataSet do...` | Remove With |
-| Unnecessary temporary variable | Used only once | Inline Temp |
-| Conditional with type | `if Obj is TSubClass then` | Replace Conditional with Polymorphism |
-| Message chain | `A.B.C.D.Execute` | Law of Demeter / Introduce Method |
-| Comment explaining what | The code should explain itself | Rename + Extract Method |
+| Método longo | > 20 linhas | Extract Method |
+| Classe inchada | > 300 linhas / múltiplas responsabilidades | Extract Class |
+| Números mágicos | `if Age > 18` | Replace with Constant |
+| Aninhamento profundo | `if...if...if` acima de 2 níveis | Replace with Guard Clauses |
+| Código duplicado | Mesmo bloco em ≥ 2 lugares | Extract Method / Pull Up |
+| Parâmetros excessivos | Método com > 4 parâmetros | Introduce Parameter Object |
+| Lógica de UI misturada | Regra de negócio em `OnClick` | Move Method to Service |
+| Uso de `with` | `with DataSet do...` | Remove With |
+| Variável temporária desnecessária | Usada só uma vez | Inline Temp |
+| Condicional por tipo | `if Obj is TSubClass then` | Replace Conditional with Polymorphism |
+| Cadeia de chamadas | `A.B.C.D.Execute` | Law of Demeter / Introduce Method |
+| Comentário explicando o óbvio | O código deveria se explicar | Rename + Extract Method |
 
 ---
 
 ## ✂️ Extract Method
 
-Extract purposeful blocks of code into named methods.
+Extraia blocos de código com propósito claro para métodos nomeados.
 
 ```pascal
-//❌ BEFORE — long method without separation of responsibilities
+// ❌ ANTES — long method without separation of responsibilities
 procedure TOrderService.PlaceOrder(AOrder: TOrder);
 var
   LTotal: Currency;
@@ -46,7 +46,7 @@ begin
   for LItem in AOrder.Items do
     LTotal := LTotal + (LItem.UnitPrice * LItem.Quantity);
 
-  //Apply discount
+  //Aplica desconto
   if AOrder.Customer.IsVip then
     LDiscount := LTotal * 0.10
   else if LTotal > 500 then
@@ -56,7 +56,7 @@ begin
 
   LTotal := LTotal - LDiscount;
 
-  //Validates stock
+  //Valida estoque
   for LItem in AOrder.Items do
   begin
     if LItem.Quantity > LItem.Product.StockQty then
@@ -68,7 +68,7 @@ begin
   FRepository.Save(AOrder);
 end;
 
-//✅ AFTER — each responsibility in its own method
+// ✅ DEPOIS — each responsibility in its own method
 procedure TOrderService.PlaceOrder(AOrder: TOrder);
 begin
   ValidateStock(AOrder);
@@ -122,7 +122,7 @@ end;
 When a class accumulates too many responsibilities, extract the cohesive responsibilities.
 
 ```pascal
-//❌ BEFORE — TCustomer with a lot of responsibility
+// ❌ ANTES — TCustomer with a lot of responsibility
 TCustomer = class
   //Customer data
   FName: string;
@@ -142,7 +142,7 @@ TCustomer = class
   function HasValidPhone: Boolean;
 end;
 
-//✅ AFTER — responsibilities extracted into cohesive classes
+// ✅ DEPOIS — responsibilities extracted into cohesive classes
 TAddress = class
 private
   FStreet: string;
@@ -170,7 +170,7 @@ public
   property Email: string read FEmail write FEmail;
 end;
 
-TCustomer = class           //now cohesive — just customer data
+TCustomer = class           //agora coesa — just customer data
 private
   FName: string;
   FAddress: TAddress;       //composition
@@ -191,7 +191,7 @@ end;
 Eliminates nesting by eliminating special cases early.
 
 ```pascal
-//❌ BEFORE — nesting makes reading difficult
+// ❌ ANTES — nesting makes reading difficult
 procedure ProcessPayment(APayment: TPayment);
 begin
   if Assigned(APayment) then
@@ -210,7 +210,7 @@ begin
   end;
 end;
 
-//✅ AFTER — guard clauses: invalid cases leave early
+// ✅ DEPOIS — guard clauses: invalid cases leave early
 procedure ProcessPayment(APayment: TPayment);
 begin
   if not Assigned(APayment) then
@@ -232,7 +232,7 @@ end;
 ## 🔢 Replace Magic Numbers with Constants
 
 ```pascal
-//❌ BEFORE
+// ❌ ANTES
 if AOrder.Items.Count > 10 then
   LDiscount := ATotal * 0.15;
 if ACustomer.Age < 18 then
@@ -240,7 +240,7 @@ if ACustomer.Age < 18 then
 if APassword.Length < 8 then
   raise EException.Create('...');
 
-//✅ AFTER
+// ✅ DEPOIS
 const
   MAX_ITEMS_WITHOUT_DISCOUNT = 10;
   BULK_DISCOUNT_RATE         = 0.15;
@@ -262,7 +262,7 @@ if APassword.Length < MINIMUM_PASSWORD_LENGTH then
 Replaces `if/case` strings with polymorphism via interfaces.
 
 ```pascal
-//❌ BEFORE — non-viola OCP type switch
+// ❌ ANTES — non-viola OCP type switch
 function CalculateTax(AOrder: TOrder): Currency;
 begin
   case AOrder.TaxRegime of
@@ -273,7 +273,7 @@ begin
   end;
 end;
 
-//✅ AFTER — polymorphism via Strategy
+// ✅ DEPOIS — polymorphism via Strategy
 ITaxStrategy = interface
   function Calculate(ATotal: Currency): Currency;
 end;
@@ -297,7 +297,7 @@ end;
 Groups related parameters into a Record or class.
 
 ```pascal
-//❌ BEFORE — method with 6 parameters
+// ❌ ANTES — method with 6 parameters
 function SearchCustomers(
   const AName: string;
   const ACity: string;
@@ -306,7 +306,7 @@ function SearchCustomers(
   AMaxAge: Integer;
   AOnlyActive: Boolean): TObjectList<TCustomer>;
 
-//✅ AFTER — parameters encapsulated in DTO
+// ✅ DEPOIS — parameters encapsulated in DTO
 TCustomerSearchCriteria = record
   Name: string;
   City: string;
@@ -327,7 +327,7 @@ function SearchCustomers(ACriteria: TCustomerSearchCriteria): TObjectList<TCusto
 `with` hides the context and makes debugging and refactoring difficult.
 
 ```pascal
-//❌ BEFORE — with `with`
+// ❌ ANTES — with `with`
 procedure LoadCustomer;
 begin
   with qryCustomers do
@@ -341,7 +341,7 @@ begin
   end;
 end;
 
-//✅ AFTER — explicit and readable
+// ✅ DEPOIS — explicit and readable
 procedure LoadCustomer;
 begin
   qryCustomers.SQL.Text := 'SELECT * FROM customers WHERE id = :id';
@@ -363,7 +363,7 @@ end;
 When a concrete class is used directly, create an interface to decouple it.
 
 ```pascal
-//❌ BEFORE — coupled to the concrete class
+// ❌ ANTES — coupled to the concrete class
 TOrderService = class
 private
   FRepository: TFireDACOrderRepository; // acoplado!
@@ -371,7 +371,7 @@ public
   constructor Create(ARepository: TFireDACOrderRepository);
 end;
 
-//✅ AFTER — depends on the abstraction
+// ✅ DEPOIS — depends on the abstraction
 IOrderRepository = interface
   ['{GUID}']
   function FindById(AId: Integer): TOrder;
