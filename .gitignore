@@ -1,59 +1,105 @@
 # =============================================================================
-# .gitignore — Delphi AI Spec-Kit
+# .gitignore — Delphi AI Spec-Kit (padronizado escopado)
 # =============================================================================
 
 # --- Delphi Build Artifacts ---
 *.dcu
-*.exe
-*.dll
-*.bpl
 *.dcp
+*.bpl
 *.drc
+*.rsm
+*.res
 *.map
 *.obj
 *.o
 *.a
+*.tds
+*.~*
+
+# Binários gerados
+*.exe
+*.dll
 
 # --- IDE Temporary / Generated Files ---
 *.local
+*.dproj.local
+*.groupproj.local
 *.identcache
 *.stat
-*.~*
 *.tvsconfig
+*.dsk
+*.~pas
+*.~dfm
+*.~dpr
 __history/
 __recovery/
 
-# --- Build / Output Directories ---
-Win32/
-Win64/
-x64/
-x86/
-Debug/
-Release/
-build/
-dist/
-output/
+# --- Build Output Directories (escopado ao projeto) ---
+**/Win32/
+**/Win64/
+**/Debug/
+**/Release/
+**/dcu/
+**/build/
+**/dist/
+**/output/
 
 # --- Dependencies and Caches ---
 node_modules/
 .venv/
 .pytest_cache/
 .mypy_cache/
+packages/
 modules/
+temp/
+tmp/
 
-# --- Sensitive / Credential Files ---
+# --- BOSS lock file deve ser versionado ---
+!**/boss-lock.json
+
+# --- Secrets and credentials ---
 *.key
 *.pfx
 *.p12
 .env
 .env.*
+sonar_token.txt
 
-# --- Large / Noisy Files ---
+# --- Logs and temporary files ---
 *.log
 *.dmp
-*.bak
 *.tmp
+*.bak
+*.old
+
+# --- Firebird/SQLite local DBs (não versionar) ---
+*.fdb
+*.gdb
+*.db
+*.sqlite
+*.sqlite3
 
 # --- OS Artifacts ---
 Thumbs.db
 .DS_Store
+
+# --- VS Code workspace ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# --- Git recovery backups ---
+.git.safety.*
+.git.backup.zip
+
+# --- Workspace de execução de skills ---
+.superpowers/
+
+# --- Skin config da IDE ---
+*.skincfg
+
+# --- Arquivos temporários de merge ---
+*.orig
+*.rej
+*.merge_file_*
